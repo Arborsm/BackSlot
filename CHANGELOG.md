@@ -1,6 +1,6 @@
 ### Added:
 - 
 ### Fixed:
-- Fixed slot arrangement config
-### Changed:
 - 
+### Changed:
+- Updated to mc 1.20.6

@@ -9,16 +9,13 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import io.netty.buffer.Unpooled;
-
 import org.spongepowered.asm.mixin.injection.At;
 
-import net.backslot.network.BackSlotServerPacket;
+import net.backslot.network.VisibilityPacket;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.world.World;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -53,10 +50,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity {
 
     private void sendPacket(int slot) {
         Collection<ServerPlayerEntity> players = PlayerLookup.tracking((ServerWorld) this.getWorld(), this.getBlockPos());
-        PacketByteBuf data = new PacketByteBuf(Unpooled.buffer());
-        data.writeIntArray(new int[] { this.getId(), slot });
-        data.writeItemStack(this.getInventory().getStack(slot));
-        players.forEach(player -> ServerPlayNetworking.send(player, BackSlotServerPacket.VISIBILITY_UPDATE_PACKET, data));
+        players.forEach(player -> ServerPlayNetworking.send(player, new VisibilityPacket(this.getId(), slot, this.getInventory().getStack(slot))));
+
     }
 
 }

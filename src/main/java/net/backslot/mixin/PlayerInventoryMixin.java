@@ -30,13 +30,20 @@ public abstract class PlayerInventoryMixin implements Inventory {
     private List<DefaultedList<ItemStack>> combinedInventory;
     @Shadow
     @Final
+    @Mutable
     public DefaultedList<ItemStack> main;
     @Shadow
     @Final
+    @Mutable
     public DefaultedList<ItemStack> armor;
     @Shadow
     @Final
+    @Mutable
     public DefaultedList<ItemStack> offHand;
+    @Shadow
+    @Mutable
+    @Final
+    public PlayerEntity player;
 
     private DefaultedList<ItemStack> backSlot;
     private DefaultedList<ItemStack> beltSlot;
@@ -59,14 +66,12 @@ public abstract class PlayerInventoryMixin implements Inventory {
         if (!this.backSlot.get(0).isEmpty()) {
             NbtCompound compoundTag = new NbtCompound();
             compoundTag.putByte("Slot", (byte) (110));
-            this.backSlot.get(0).writeNbt(compoundTag);
-            tag.add(compoundTag);
+            tag.add(this.backSlot.get(0).encode(this.player.getRegistryManager(), compoundTag));
         }
         if (!this.beltSlot.get(0).isEmpty()) {
             NbtCompound compoundTag = new NbtCompound();
             compoundTag.putByte("Slot", (byte) (111));
-            this.beltSlot.get(0).writeNbt(compoundTag);
-            tag.add(compoundTag);
+            tag.add(this.beltSlot.get(0).encode(this.player.getRegistryManager(), compoundTag));
         }
 
     }
@@ -78,7 +83,7 @@ public abstract class PlayerInventoryMixin implements Inventory {
         for (int i = 0; i < tag.size(); ++i) {
             NbtCompound compoundTag = tag.getCompound(i);
             int slot = compoundTag.getByte("Slot") & 255;
-            ItemStack itemStack = ItemStack.fromNbt(compoundTag);
+            ItemStack itemStack = ItemStack.fromNbt(this.player.getRegistryManager(), compoundTag).orElse(ItemStack.EMPTY);
             if (!itemStack.isEmpty()) {
                 if (slot >= 110 && slot < this.backSlot.size() + 110) {
                     this.backSlot.set(slot - 110, itemStack);

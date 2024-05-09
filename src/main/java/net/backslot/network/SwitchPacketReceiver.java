@@ -7,7 +7,6 @@ import chronosacaria.mcdw.bases.McdwSpear;
 import chronosacaria.mcdw.bases.McdwStaff;
 import net.backslot.BackSlotMain;
 import net.backslot.sound.BackSlotSounds;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.medievalweapons.item.Big_Axe_Item;
 import net.medievalweapons.item.Francisca_Item;
@@ -29,23 +28,20 @@ import net.minecraft.item.ShieldItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
-public class SwitchPacketReceiver implements ServerPlayNetworking.PlayChannelHandler {
+public class SwitchPacketReceiver implements ServerPlayNetworking.PlayPayloadHandler<SwitchPacket> {
 
     @Override
-    public void receive(MinecraftServer server, ServerPlayerEntity player, ServerPlayNetworkHandler handler, PacketByteBuf buffer, PacketSender responseSender) {
-        // target slot
-        int slot = buffer.readInt();
+    public void receive(SwitchPacket payload, ServerPlayNetworking.Context context) {
 
-        server.execute(() -> {
+        int slot = payload.slotId();
+
+        context.player().server.execute(() -> {
             // player inventory and selected slot
-            PlayerInventory playerInventory = player.getInventory();
+            PlayerInventory playerInventory = context.player().getInventory();
             int selectedSlot = playerInventory.selectedSlot;
 
             // think in a way of pulling out case (although it can be just a putting back)
@@ -135,10 +131,10 @@ public class SwitchPacketReceiver implements ServerPlayNetworking.PlayChannelHan
                     ItemStack stackRemaining = playerInventory.getStack(slotToPullOutTo);
                     // line below is from implementation of ServerPlayerEntity.dropSelectedItem()
                     // without fully understanding what it does
-                    player.currentScreenHandler.getSlotIndex(playerInventory, slotToPullOutTo).ifPresent((i) -> {
-                        player.currentScreenHandler.setPreviousTrackedSlot(i, stackRemaining);
+                    context.player().currentScreenHandler.getSlotIndex(playerInventory, slotToPullOutTo).ifPresent((i) -> {
+                        context.player().currentScreenHandler.setPreviousTrackedSlot(i, stackRemaining);
                     });
-                    player.dropItem(stackToDrop, false, true);
+                    context.player().dropItem(stackToDrop, false, true);
                     stackToPutBack = ItemStack.EMPTY;
                     // do switch with an empty hand
                     playerInventory.setStack(slotToPullOutTo, stackInSlotToPullOutFrom); // pull out
@@ -154,21 +150,24 @@ public class SwitchPacketReceiver implements ServerPlayNetworking.PlayChannelHan
                     if (stackInSlotToPullOutTo.isEmpty() && !stackInSlotToPullOutFrom.isEmpty()) {
                         if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
                             // pulling out sword to an empty hand
-                            player.getWorld().playSound(null, player.getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                            context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F, 1.0F);
                         } else {
                             // pulling out others to an empty hand
-                            player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                            context.player().getWorld().playSound(null, context.player().getBlockPos(), (SoundEvent) SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
                         }
                     } else if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
                         // pulling out sword to a non empty hand
-                        player.getWorld().playSound(null, player.getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
+                        context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F,
+                                0.9F + context.player().getRandom().nextFloat() * 0.2F);
                     } else if (stackInSlotToPullOutTo.getItem() instanceof SwordItem) {
                         // putting back sword item (including while pulling out what there was other
                         // than sword)
-                        player.getWorld().playSound(null, player.getBlockPos(), BackSlotSounds.PACK_UP_ITEM_EVENT, SoundCategory.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
+                        context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.PACK_UP_ITEM_EVENT, SoundCategory.PLAYERS, 1.0F,
+                                0.9F + context.player().getRandom().nextFloat() * 0.2F);
                     } else if (!stackInSlotToPullOutTo.isEmpty()) {
                         // putting back other than sword
-                        player.getWorld().playSound(null, player.getBlockPos(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                        context.player().getWorld().playSound(null, context.player().getBlockPos(), (SoundEvent) SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                        // public void playSound(@Nullable Entity source, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
                     }
                 }
             }
@@ -195,8 +194,9 @@ public class SwitchPacketReceiver implements ServerPlayNetworking.PlayChannelHan
                 || (slot == 42 && (stack.isIn(BackSlotMain.BELTSLOT_ITEMS) || stack.getItem() instanceof FlintAndSteelItem || stack.getItem() instanceof ShearsItem
                         || (BackSlotMain.isMedievalWeaponsLoaded && stack.getItem() instanceof Francisca_Item)))) {
             return true;
-        } else
+        } else {
             return false;
+        }
     }
 
 }

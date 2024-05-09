@@ -2,15 +2,13 @@ package net.backslot.client.key;
 
 import org.lwjgl.glfw.GLFW;
 
-import io.netty.buffer.Unpooled;
-import net.backslot.network.BackSlotServerPacket;
+import net.backslot.network.SwitchPacket;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.packet.c2s.play.CustomPayloadC2SPacket;
 import net.minecraft.util.Identifier;
 import de.siphalor.amecs.api.AmecsKeyBinding;
 import de.siphalor.amecs.api.KeyModifiers;
@@ -39,9 +37,7 @@ public class SwitchKey {
     }
 
     public static void syncSlotSwitchItem(MinecraftClient client, int slot) {
-        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-        buf.writeInt(slot);
-        client.getNetworkHandler().sendPacket(new CustomPayloadC2SPacket(BackSlotServerPacket.SWITCH_PACKET, buf));
+        ClientPlayNetworking.send(new SwitchPacket(slot));
     }
 
 }

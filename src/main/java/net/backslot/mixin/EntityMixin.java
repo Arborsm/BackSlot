@@ -17,10 +17,8 @@ import net.minecraft.item.ItemStack;
 public class EntityMixin {
 
     @Inject(method = "getItemsEquipped", at = @At("RETURN"), cancellable = true)
-    public void getItemsEquippedWithBackSlotItems(CallbackInfoReturnable<Iterable<ItemStack>> info) {
-        Entity entity = (Entity) (Object) this;
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity playerEntity = (PlayerEntity) entity;
+    private void getItemsEquippedMixin(CallbackInfoReturnable<Iterable<ItemStack>> info) {
+        if ((Entity) (Object) this instanceof PlayerEntity playerEntity) {
             ItemStack backSlotStack = playerEntity.getInventory().getStack(41);
             ItemStack beltSlotStack = playerEntity.getInventory().getStack(42);
             Iterable<ItemStack> equippedItems = info.getReturnValue();

@@ -16,11 +16,11 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class BackSlotSprites {
 
-    // assets/minecraft/atlases/blocks.json
     public static final Identifier EMPTY_BACK_SLOT_TEXTURE = new Identifier("backslot", "gui/empty_back_slot");
     public static final Identifier EMPTY_BELT_SLOT_TEXTURE = new Identifier("backslot", "gui/empty_belt_slot");
 
-    private static final Identifier WIDGETS_TEXTURE = new Identifier("textures/gui/widgets.png");
+    public static final Identifier HOTBAR_BACK_SLOT_TEXTURE = new Identifier("backslot", "textures/gui/hotbar_back_slot.png");
+    public static final Identifier HOTBAR_BELT_SLOT_TEXTURE = new Identifier("backslot", "textures/gui/hotbar_back_slot.png");
 
     public static void init() {
         HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
@@ -32,25 +32,23 @@ public class BackSlotSprites {
                     ItemStack backSlotStack = playerEntity.getInventory().getStack(41);
                     ItemStack beltSlotStack = playerEntity.getInventory().getStack(42);
 
-                    if (!backSlotStack.isEmpty() || !beltSlotStack.isEmpty()) {
+                    int i = drawContext.getScaledWindowWidth() / 2;
+                    int p = drawContext.getScaledWindowHeight() - 19;
+                    int leftHandX = playerEntity.getMainArm().getOpposite() == Arm.LEFT ? -52 : -30;
 
-                        int i = drawContext.getScaledWindowWidth() / 2;
-                        int p = drawContext.getScaledWindowHeight() - 16 - 3;
-                        Arm arm = playerEntity.getMainArm().getOpposite();
+                    if (!backSlotStack.isEmpty()) {
+                        // Required
+                        RenderSystem.enableBlend();
+                        drawContext.drawTexture(HOTBAR_BELT_SLOT_TEXTURE, i - 90 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p - 3 + BackSlotMain.CONFIG.hudSlotY, 0, 0, 22, 22, 22, 22);
 
-                        // RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                        renderHotbarItem(drawContext, client, i - 87 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity, backSlotStack, 0);
+                    }
+                    if (!beltSlotStack.isEmpty()) {
+                        // Required
                         RenderSystem.enableBlend();
-                        // RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-                        drawContext.drawTexture(WIDGETS_TEXTURE, i - 91 + (arm == Arm.LEFT ? -29 : 0) + BackSlotMain.CONFIG.hudSlotX,
-                                drawContext.getScaledWindowHeight() - 23 + BackSlotMain.CONFIG.hudSlotY, 24, 22, 29, 24);
-                        renderHotbarItem(drawContext, client, i - 91 + (arm == Arm.LEFT ? -26 : 0) + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity,
-                                backSlotStack, 0);
-                        RenderSystem.enableBlend();
-                        // RenderSystem.setShaderTexture(0, WIDGETS_TEXTURE);
-                        drawContext.drawTexture(WIDGETS_TEXTURE, i - 112 + (arm == Arm.LEFT ? -29 : 0) + BackSlotMain.CONFIG.hudSlotX,
-                                drawContext.getScaledWindowHeight() - 23 + BackSlotMain.CONFIG.hudSlotY, 24, 22, 29, 24);
-                        renderHotbarItem(drawContext, client, i - 112 + (arm == Arm.LEFT ? -26 : 0) + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity,
-                                beltSlotStack, 0);
+                        drawContext.drawTexture(HOTBAR_BACK_SLOT_TEXTURE, i - 112 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p - 3 + BackSlotMain.CONFIG.hudSlotY, 0, 0, 22, 22, 22, 22);
+
+                        renderHotbarItem(drawContext, client, i - 109 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity, beltSlotStack, 0);
                     }
                 }
             }
