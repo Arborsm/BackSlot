@@ -29,7 +29,6 @@ import net.minecraft.item.SwordItem;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.TridentItem;
 import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
 public class SwitchPacketReceiver implements ServerPlayNetworking.PlayPayloadHandler<SwitchPacket> {
@@ -38,7 +37,6 @@ public class SwitchPacketReceiver implements ServerPlayNetworking.PlayPayloadHan
     public void receive(SwitchPacket payload, ServerPlayNetworking.Context context) {
 
         int slot = payload.slotId();
-
         context.player().server.execute(() -> {
             // player inventory and selected slot
             PlayerInventory playerInventory = context.player().getInventory();
@@ -153,21 +151,21 @@ public class SwitchPacketReceiver implements ServerPlayNetworking.PlayPayloadHan
                             context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F, 1.0F);
                         } else {
                             // pulling out others to an empty hand
-                            context.player().getWorld().playSound(null, context.player().getBlockPos(), (SoundEvent) SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                            context.player().getWorld().playSound(null, context.player().getX(), context.player().getY(), context.player().getZ(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+                                    SoundCategory.PLAYERS, 1.0f, 1.0f, context.player().getWorld().getRandom().nextLong());
                         }
                     } else if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
                         // pulling out sword to a non empty hand
                         context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.SHEATH_SWORD_EVENT, SoundCategory.PLAYERS, 1.0F,
                                 0.9F + context.player().getRandom().nextFloat() * 0.2F);
                     } else if (stackInSlotToPullOutTo.getItem() instanceof SwordItem) {
-                        // putting back sword item (including while pulling out what there was other
-                        // than sword)
+                        // putting back sword item (including while pulling out what there was other than sword)
                         context.player().getWorld().playSound(null, context.player().getBlockPos(), BackSlotSounds.PACK_UP_ITEM_EVENT, SoundCategory.PLAYERS, 1.0F,
                                 0.9F + context.player().getRandom().nextFloat() * 0.2F);
                     } else if (!stackInSlotToPullOutTo.isEmpty()) {
                         // putting back other than sword
-                        context.player().getWorld().playSound(null, context.player().getBlockPos(), (SoundEvent) SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, SoundCategory.PLAYERS, 1.0F, 1.0F);
-                        // public void playSound(@Nullable Entity source, BlockPos pos, SoundEvent sound, SoundCategory category, float volume, float pitch) {
+                        context.player().getWorld().playSound(null, context.player().getX(), context.player().getY(), context.player().getZ(), SoundEvents.ITEM_ARMOR_EQUIP_GENERIC,
+                                SoundCategory.PLAYERS, 1.0f, 1.0f, context.player().getWorld().getRandom().nextLong());
                     }
                 }
             }
