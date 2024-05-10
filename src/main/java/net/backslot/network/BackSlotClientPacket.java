@@ -3,7 +3,6 @@ package net.backslot.network;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
@@ -11,8 +10,6 @@ import net.minecraft.item.ItemStack;
 public class BackSlotClientPacket {
 
     public static void init() {
-
-        PayloadTypeRegistry.playS2C().register(VisibilityPacket.PACKET_ID, VisibilityPacket.PACKET_CODEC);
         ClientPlayNetworking.registerGlobalReceiver(VisibilityPacket.PACKET_ID, (payload, context) -> {
             int entityId = payload.entityId();
             int slotId = payload.slotId();
