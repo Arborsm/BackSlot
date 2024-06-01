@@ -10,14 +10,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
-@Mixin(Entity.class)
-public class EntityMixin {
+@Mixin(LivingEntity.class)
+public class LivingEntityMixin {
 
-    @Inject(method = "getItemsEquipped", at = @At("RETURN"), cancellable = true)
-    private void getItemsEquippedMixin(CallbackInfoReturnable<Iterable<ItemStack>> info) {
+    @Inject(method = "getEquippedItems", at = @At("RETURN"), cancellable = true)
+    private void getEquippedItemsMixin(CallbackInfoReturnable<Iterable<ItemStack>> info) {
         if ((Entity) (Object) this instanceof PlayerEntity playerEntity) {
             ItemStack backSlotStack = playerEntity.getInventory().getStack(41);
             ItemStack beltSlotStack = playerEntity.getInventory().getStack(42);

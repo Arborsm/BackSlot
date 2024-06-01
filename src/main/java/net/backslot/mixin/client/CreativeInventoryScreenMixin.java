@@ -19,7 +19,6 @@ public abstract class CreativeInventoryScreenMixin extends AbstractInventoryScre
 
     public CreativeInventoryScreenMixin(PlayerEntity player) {
         super(new CreativeInventoryScreen.CreativeScreenHandler(player), player.getInventory(), ScreenTexts.EMPTY);
-        player.currentScreenHandler = this.handler;
     }
 
     @Inject(method = "setSelectedTab", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screen/ingame/CreativeInventoryScreen;deleteItemSlot:Lnet/minecraft/screen/slot/Slot;", shift = At.Shift.BEFORE))

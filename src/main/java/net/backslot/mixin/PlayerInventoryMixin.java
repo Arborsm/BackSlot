@@ -22,7 +22,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.collection.DefaultedList;
 
-@Mixin(PlayerInventory.class)
+@Mixin(value = PlayerInventory.class, priority = 999)
 public abstract class PlayerInventoryMixin implements Inventory {
     @Shadow
     @Final
@@ -52,7 +52,7 @@ public abstract class PlayerInventoryMixin implements Inventory {
     }
 
     @Inject(method = "<init>*", at = @At("RETURN"))
-    private void onConstructed(PlayerEntity playerEntity, CallbackInfo info) {
+    private void initMixin(PlayerEntity playerEntity, CallbackInfo info) {
         this.backSlot = DefaultedList.ofSize(1, ItemStack.EMPTY);
         this.beltSlot = DefaultedList.ofSize(1, ItemStack.EMPTY);
         this.combinedInventory = new ArrayList<>(combinedInventory);
@@ -62,7 +62,7 @@ public abstract class PlayerInventoryMixin implements Inventory {
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
-    public void serializeMixin(NbtList tag, CallbackInfoReturnable<NbtList> info) {
+    public void writeNbtMixin(NbtList tag, CallbackInfoReturnable<NbtList> info) {
         if (!this.backSlot.get(0).isEmpty()) {
             NbtCompound compoundTag = new NbtCompound();
             compoundTag.putByte("Slot", (byte) (110));
@@ -77,7 +77,7 @@ public abstract class PlayerInventoryMixin implements Inventory {
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
-    public void deserializeMixin(NbtList tag, CallbackInfo info) {
+    public void readNbtMixin(NbtList tag, CallbackInfo info) {
         this.backSlot.clear();
         this.beltSlot.clear();
         for (int i = 0; i < tag.size(); ++i) {
@@ -94,16 +94,12 @@ public abstract class PlayerInventoryMixin implements Inventory {
         }
     }
 
-    @Inject(method = "size", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "size", at = @At("RETURN"), cancellable = true)
     public void sizeMixin(CallbackInfoReturnable<Integer> info) {
-        int size = 0;
-        for (DefaultedList<ItemStack> list : combinedInventory) {
-            size += list.size();
-        }
-        info.setReturnValue(size);
+        info.setReturnValue(info.getReturnValue() + 2);
     }
 
-    @Inject(method = "isEmpty", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "isEmpty", at = @At("TAIL"), cancellable = true)
     public void isEmptyMixin(CallbackInfoReturnable<Boolean> info) {
         if (!this.backSlot.isEmpty() || !this.beltSlot.isEmpty()) {
             info.setReturnValue(false);

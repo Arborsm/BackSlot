@@ -24,7 +24,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
 import net.minecraft.enchantment.EnchantmentHelper;
 
-@Mixin(PlayerScreenHandler.class)
+@Mixin(value = PlayerScreenHandler.class, priority = 999)
 public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandler<CraftingInventory> {
     private static boolean changeArrangement = BackSlotMain.CONFIG.changeSlotArrangement;
 
@@ -33,13 +33,14 @@ public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandl
     }
 
     // Tried different injection points to fix a mod compatibility bug but it didnt work
-    @Inject(method = "<init>*", at = @At("TAIL"))
+    @Inject(method = "<init>*", at = @At("RETURN"))
     private void onConstructed(PlayerInventory inventory, boolean onServer, PlayerEntity owner, CallbackInfo info) {
         int backSlotX = BackSlotMain.CONFIG.backSlotX;
         int backSlotY = BackSlotMain.CONFIG.backSlotY;
 
         int beltSlotX = BackSlotMain.CONFIG.beltSlotX;
         int beltSlotY = BackSlotMain.CONFIG.beltSlotY;
+
         if (changeArrangement) {
             backSlotX += 75;
             backSlotY += 22;
