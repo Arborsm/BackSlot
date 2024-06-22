@@ -20,8 +20,8 @@ public class SwitchKey {
 
     public static void init() {
 
-        backSlotKeyBind = new AmecsKeyBinding(new Identifier("backslot", "switch_backslot"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "category.backslot.key", new KeyModifiers());
-        beltSlotKeyBind = new AmecsKeyBinding(new Identifier("backslot", "switch_beltslot"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "category.backslot.key", new KeyModifiers().setShift(true));
+        backSlotKeyBind = new AmecsKeyBinding(Identifier.of("backslot", "switch_backslot"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "category.backslot.key", new KeyModifiers());
+        beltSlotKeyBind = new AmecsKeyBinding(Identifier.of("backslot", "switch_beltslot"), InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, "category.backslot.key", new KeyModifiers().setShift(true));
         KeyBindingHelper.registerKeyBinding(backSlotKeyBind);
         KeyBindingHelper.registerKeyBinding(beltSlotKeyBind);
         ClientTickEvents.END_CLIENT_TICK.register(client -> {

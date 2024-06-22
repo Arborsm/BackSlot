@@ -16,14 +16,14 @@ import net.minecraft.util.Identifier;
 @Environment(EnvType.CLIENT)
 public class BackSlotSprites {
 
-    public static final Identifier EMPTY_BACK_SLOT_TEXTURE = new Identifier("backslot", "gui/empty_back_slot");
-    public static final Identifier EMPTY_BELT_SLOT_TEXTURE = new Identifier("backslot", "gui/empty_belt_slot");
+    public static final Identifier EMPTY_BACK_SLOT_TEXTURE = Identifier.of("backslot", "gui/empty_back_slot");
+    public static final Identifier EMPTY_BELT_SLOT_TEXTURE = Identifier.of("backslot", "gui/empty_belt_slot");
 
-    public static final Identifier HOTBAR_BACK_SLOT_TEXTURE = new Identifier("backslot", "textures/gui/hotbar_back_slot.png");
-    public static final Identifier HOTBAR_BELT_SLOT_TEXTURE = new Identifier("backslot", "textures/gui/hotbar_back_slot.png");
+    public static final Identifier HOTBAR_BACK_SLOT_TEXTURE = Identifier.of("backslot", "textures/gui/hotbar_back_slot.png");
+    public static final Identifier HOTBAR_BELT_SLOT_TEXTURE = Identifier.of("backslot", "textures/gui/hotbar_back_slot.png");
 
     public static void init() {
-        HudRenderCallback.EVENT.register((drawContext, tickDelta) -> {
+        HudRenderCallback.EVENT.register((drawContext, tickCounter) -> {
             MinecraftClient client = MinecraftClient.getInstance();
             if (!client.options.hudHidden) {
                 PlayerEntity playerEntity = client.player;
@@ -41,14 +41,16 @@ public class BackSlotSprites {
                         RenderSystem.enableBlend();
                         drawContext.drawTexture(HOTBAR_BELT_SLOT_TEXTURE, i - 90 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p - 3 + BackSlotMain.CONFIG.hudSlotY, 0, 0, 22, 22, 22, 22);
 
-                        renderHotbarItem(drawContext, client, i - 87 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity, backSlotStack, 0);
+                        renderHotbarItem(drawContext, client, i - 87 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickCounter.getTickDelta(true), playerEntity,
+                                backSlotStack, 0);
                     }
                     if (!beltSlotStack.isEmpty()) {
                         // Required
                         RenderSystem.enableBlend();
                         drawContext.drawTexture(HOTBAR_BACK_SLOT_TEXTURE, i - 112 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p - 3 + BackSlotMain.CONFIG.hudSlotY, 0, 0, 22, 22, 22, 22);
 
-                        renderHotbarItem(drawContext, client, i - 109 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickDelta, playerEntity, beltSlotStack, 0);
+                        renderHotbarItem(drawContext, client, i - 109 + leftHandX + BackSlotMain.CONFIG.hudSlotX, p + BackSlotMain.CONFIG.hudSlotY, tickCounter.getTickDelta(true), playerEntity,
+                                beltSlotStack, 0);
                     }
                 }
             }

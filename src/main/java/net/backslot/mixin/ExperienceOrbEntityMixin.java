@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.At;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -21,8 +20,12 @@ public class ExperienceOrbEntityMixin {
     private Map.Entry<EquipmentSlot, ItemStack> repairPlayerGearsMixin(Map.Entry<EquipmentSlot, ItemStack> original, PlayerEntity player, int amount) {
         ItemStack backStack = player.getInventory().getStack(41);
         ItemStack beltStack = player.getInventory().getStack(42);
-        boolean backSlotRepairable = !backStack.isEmpty() && backStack.isDamaged() && EnchantmentHelper.getLevel(Enchantments.MENDING, backStack) > 0;
-        boolean beltSlotRepairable = !beltStack.isEmpty() && beltStack.isDamaged() && EnchantmentHelper.getLevel(Enchantments.MENDING, beltStack) > 0;
+        boolean backSlotRepairable = !backStack.isEmpty() && backStack.isDamaged()
+                && beltStack.getEnchantments().getEnchantments().stream().anyMatch(entry -> entry.matchesId(Enchantments.MENDING.getRegistry()));
+        boolean beltSlotRepairable = !beltStack.isEmpty() && beltStack.isDamaged()
+                && beltStack.getEnchantments().getEnchantments().stream().anyMatch(entry -> entry.matchesId(Enchantments.MENDING.getRegistry()));
+
+        beltStack.getEnchantments().getEnchantments().stream().anyMatch(entry -> entry.matchesId(Enchantments.MENDING.getRegistry()));
         if (backSlotRepairable || beltSlotRepairable) {
             if (original != null) {
                 if (backSlotRepairable && beltSlotRepairable) {

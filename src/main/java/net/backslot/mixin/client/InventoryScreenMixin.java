@@ -25,7 +25,7 @@ import net.minecraft.util.Identifier;
 @Mixin(InventoryScreen.class)
 public abstract class InventoryScreenMixin extends AbstractInventoryScreen<PlayerScreenHandler> implements RecipeBookProvider {
 
-    private static final Identifier BACK_TEXTURE = new Identifier("backslot", "textures/gui/blank.png");
+    private static final Identifier BACK_TEXTURE = Identifier.of("backslot", "textures/gui/blank.png");
     @Shadow
     @Mutable
     @Final

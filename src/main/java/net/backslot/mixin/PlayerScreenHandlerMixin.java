@@ -10,8 +10,9 @@ import org.spongepowered.asm.mixin.injection.At;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.recipe.CraftingRecipe;
+import net.minecraft.recipe.input.CraftingRecipeInput;
 import net.minecraft.screen.AbstractRecipeScreenHandler;
 import net.minecraft.screen.PlayerScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
@@ -22,10 +23,10 @@ import net.backslot.client.sprite.BackSlotSprites;
 import net.backslot.network.SwitchPacketReceiver;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.EnvType;
-import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 
 @Mixin(value = PlayerScreenHandler.class, priority = 999)
-public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandler<CraftingInventory> {
+public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandler<CraftingRecipeInput, CraftingRecipe> {
     private static boolean changeArrangement = BackSlotMain.CONFIG.changeSlotArrangement;
 
     public PlayerScreenHandlerMixin(ScreenHandlerType<PlayerScreenHandler> screenHandlerType, int i) {
@@ -62,7 +63,9 @@ public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandl
             @Override
             public boolean canTakeItems(PlayerEntity playerEntity) {
                 ItemStack itemStack = this.getStack();
-                return !itemStack.isEmpty() && !playerEntity.isCreative() && EnchantmentHelper.hasBindingCurse(itemStack) ? false : super.canTakeItems(playerEntity);
+                return !itemStack.isEmpty() && !playerEntity.isCreative()
+                        && itemStack.getEnchantments().getEnchantments().stream().anyMatch(entry -> entry.matchesId(Enchantments.BINDING_CURSE.getRegistry())) ? false
+                                : super.canTakeItems(playerEntity);
             }
 
             @Environment(EnvType.CLIENT)
@@ -87,7 +90,9 @@ public abstract class PlayerScreenHandlerMixin extends AbstractRecipeScreenHandl
             @Override
             public boolean canTakeItems(PlayerEntity playerEntity) {
                 ItemStack itemStack = this.getStack();
-                return !itemStack.isEmpty() && !playerEntity.isCreative() && EnchantmentHelper.hasBindingCurse(itemStack) ? false : super.canTakeItems(playerEntity);
+                return !itemStack.isEmpty() && !playerEntity.isCreative()
+                        && itemStack.getEnchantments().getEnchantments().stream().anyMatch(entry -> entry.matchesId(Enchantments.BINDING_CURSE.getRegistry())) ? false
+                                : super.canTakeItems(playerEntity);
             }
 
             @Environment(EnvType.CLIENT)
