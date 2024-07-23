@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.arbor.backslotforge.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "BackSlotForge.refmap.json",
+  "plugin": "dev.arbor.backslotforge.mixin.compat.BackSlotMixinPlugin",
+  "mixins": [
+    "EntityMixin",
+    "EntityTrackerEntryMixin",
+    "ExperienceOrbEntityMixin",
+    "PlayerInventoryMixin",
+    "PlayerScreenHandlerMixin",
+    "ServerPlayerEntityMixin",
+    "compat.OnDeathItemDropCompatibility"
+  ],
+  "client": [
+    "client.CreativeInventoryScreenMixin",
+    "client.InventoryScreenMixin",
+    "client.PlayerEntityRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
