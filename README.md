@@ -5,7 +5,7 @@ BackSlotForge adds extra slots which are easily accessible for storing your swor
 BackSlotForge is a mod built for the Forge. It requires [Cloth Config API](https://www.curseforge.com/minecraft/mc-mods/cloth-config) to be installed separately; all other dependencies are installed with the mod.
 
 ### License
-BackSlotForge is licensed under GLPv3 from [BackSlot](https://github.com/Globox1997/BackSlot).
+BackSlotForge is licensed under GLPv3 and from [BackSlot](https://github.com/Globox1997/BackSlot).
 
 ### Datapacks
 Add items which can be worn on the back or belt via a datapack. There are two backslot item tags given called `backslot_items` and `beltslot_items`. To adjust the position and size of the rendered items, a resource pack is needed. BackSlot uses the head renderer which can be set or configured in the models folder and looks like this:
