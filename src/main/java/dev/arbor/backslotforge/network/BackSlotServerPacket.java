@@ -1,6 +1,5 @@
 package dev.arbor.backslotforge.network;
 
-import dev.arbor.backslotforge.BackSlotForge;
 import dev.arbor.backslotforge.BackSlotMain;
 import dev.arbor.backslotforge.sound.BackSlotSounds;
 import net.minecraft.network.FriendlyByteBuf;
@@ -12,9 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.*;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.io.IOException;
-
-public class BackSlotServerPacket implements IBackSlotPacket  {
+public class BackSlotServerPacket implements IBackSlotPacket {
     private final int slot;
 
     public BackSlotServerPacket(int slot) {
@@ -27,6 +24,10 @@ public class BackSlotServerPacket implements IBackSlotPacket  {
                 || (slot == 41 && (stack.is(BackSlotMain.BACKSLOT_ITEMS) || stack.getItem() instanceof ProjectileWeaponItem || stack.getItem() instanceof FishingRodItem
                 || stack.getItem() instanceof TridentItem || stack.getItem() instanceof FoodOnAStickItem)) || (slot == 42 && (stack.is(BackSlotMain.BELTSLOT_ITEMS)
                 || stack.getItem() instanceof FlintAndSteelItem || stack.getItem() instanceof ShearsItem));
+    }
+
+    public static BackSlotServerPacket decode(FriendlyByteBuf buffer) {
+        return new BackSlotServerPacket(buffer.readInt());
     }
 
     @Override
@@ -139,28 +140,24 @@ public class BackSlotServerPacket implements IBackSlotPacket  {
             // play sound if done switching
             if (doneSwitching) {
                 if (BackSlotMain.CONFIG.backslotSounds) {
-                    try(var level = player.level()) {
-                        if (stackInSlotToPullOutTo.isEmpty() && !stackInSlotToPullOutFrom.isEmpty()) {
-                            if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
-                                // pulling out sword to an empty hand
-                                level.playSound(null, player.blockPosition(), BackSlotSounds.SHEATH_SWORD_EVENT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-                            } else {
-                                // pulling out others to an empty hand
-                                level.playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.PLAYERS, 1.0F, 1.0F);
-                            }
-                        } else if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
-                            // pulling out sword to a non-empty hand
-                            level.playSound(null, player.blockPosition(), BackSlotSounds.SHEATH_SWORD_EVENT.get(), SoundSource.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
-                        } else if (stackInSlotToPullOutTo.getItem() instanceof SwordItem) {
-                            // putting back sword item (including while pulling out what there was other
-                            // than sword)
-                            level.playSound(null, player.blockPosition(), BackSlotSounds.PACK_UP_ITEM_EVENT.get(), SoundSource.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
-                        } else if (!stackInSlotToPullOutTo.isEmpty()) {
-                            // putting back other than sword
-                            level.playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    if (stackInSlotToPullOutTo.isEmpty() && !stackInSlotToPullOutFrom.isEmpty()) {
+                        if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
+                            // pulling out sword to an empty hand
+                            player.level().playSound(null, player.blockPosition(), BackSlotSounds.SHEATH_SWORD_EVENT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                        } else {
+                            // pulling out others to an empty hand
+                            player.level().playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.PLAYERS, 1.0F, 1.0F);
                         }
-                    } catch (IOException e) {
-                        BackSlotForge.info("Failed to play sound {}", e);
+                    } else if (stackInSlotToPullOutFrom.getItem() instanceof SwordItem) {
+                        // pulling out sword to a non-empty hand
+                        player.level().playSound(null, player.blockPosition(), BackSlotSounds.SHEATH_SWORD_EVENT.get(), SoundSource.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
+                    } else if (stackInSlotToPullOutTo.getItem() instanceof SwordItem) {
+                        // putting back sword item (including while pulling out what there was other
+                        // than sword)
+                        player.level().playSound(null, player.blockPosition(), BackSlotSounds.PACK_UP_ITEM_EVENT.get(), SoundSource.PLAYERS, 1.0F, 0.9F + player.getRandom().nextFloat() * 0.2F);
+                    } else if (!stackInSlotToPullOutTo.isEmpty()) {
+                        // putting back other than sword
+                        player.level().playSound(null, player.blockPosition(), SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.PLAYERS, 1.0F, 1.0F);
                     }
                 }
             }
@@ -170,9 +167,5 @@ public class BackSlotServerPacket implements IBackSlotPacket  {
     @Override
     public void encode(FriendlyByteBuf buffer) {
         buffer.writeInt(slot);
-    }
-
-    public static BackSlotServerPacket decode(FriendlyByteBuf buffer) {
-        return new BackSlotServerPacket(buffer.readInt());
     }
 }

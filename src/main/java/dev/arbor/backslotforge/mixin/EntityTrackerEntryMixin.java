@@ -32,14 +32,11 @@ public class EntityTrackerEntryMixin {
                 if (!serverPlayer.getInventory().getItem(i).isEmpty()) {
                     BackSlotForge.getPacketHandler().sendToAllTracking(
                             new BackSlotClientPacket(i, serverPlayer.getId(), serverPlayer.getInventory().getItem(i)), serverPlayer);
-                    BackSlotForge.debug("Sending packet to " + serverPlayer.getDisplayName().getString() + " for slot " + i);
                 }
                 if (!player.getInventory().getItem(i).isEmpty()) {
                     BackSlotForge.getPacketHandler().sendToAllTracking(
                             new BackSlotClientPacket(i, serverPlayer.getId(), serverPlayer.getInventory().getItem(i)), serverPlayer);
-                    BackSlotForge.debug("Sending packet to " + serverPlayer.getDisplayName().getString() + " for slot " + i);
                 }
-                BackSlotForge.debug("Try sending packet to " + serverPlayer.getDisplayName().getString());
             }
         }
     }

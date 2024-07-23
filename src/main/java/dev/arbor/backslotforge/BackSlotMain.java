@@ -22,5 +22,4 @@ public class BackSlotMain {
         AutoConfig.register(BackSlotConfig.class, JanksonConfigSerializer::new);
         CONFIG = AutoConfig.getConfigHolder(BackSlotConfig.class).getConfig();
     }
-
 }

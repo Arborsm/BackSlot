@@ -14,8 +14,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.io.IOException;
-
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerEntityMixin extends Player {
     @Unique
@@ -30,8 +28,7 @@ public abstract class ServerPlayerEntityMixin extends Player {
     // LivingEntity getEquipmentChanges method only checks EquipmentSlot each tick
     @Inject(method = "tick", at = @At("TAIL"))
     private void tickMixin(CallbackInfo info) {
-        try (var level = this.level()) {
-            if (!level.isClientSide()) {
+            if (!this.level().isClientSide()) {
                 if (!ItemStack.isSameItem(backSlotForge$backSlotStack, this.getInventory().getItem(41))) {
                     backSlotForge$sendPacket(41);
                 }
@@ -41,15 +38,11 @@ public abstract class ServerPlayerEntityMixin extends Player {
                 }
                 backSlotForge$beltSlotStack = this.getInventory().getItem(42);
             }
-        } catch (IOException e) {
-            BackSlotForge.info("Failed to send packet for slot {}", e);
-        }
     }
 
     @Unique
     private void backSlotForge$sendPacket(int slot) {
         BackSlotForge.getPacketHandler().sendToAllTracking(
                 new BackSlotClientPacket(slot, this.getId(), this.getInventory().getItem(slot)), this.level(), this.blockPosition());
-        BackSlotForge.debug("Sending packet for slot {}", slot);
     }
 }
